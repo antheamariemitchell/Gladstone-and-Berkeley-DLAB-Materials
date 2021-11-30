@@ -1,0 +1,47 @@
+library(rpart)
+library(partykit)
+
+#load titanic data
+data(ptitanic)
+View(ptitanic)
+
+#shuffle titanic data
+titanic=ptitanic[sample(1:length(ptitanic[,1]),length(ptitanic[,1])),]
+
+#split training data and test data
+train_index=1:round(nrow(ptitanic)*0.7)
+train_data=ptitanic[train_index,]
+test_data=ptitanic[-train_index,]
+
+#train a decision tree
+survived <- rpart(survived ~ ., data = train_data)
+
+#visualize the decision tree
+new_tree <- as.party(survived)
+plot(new_tree) 
+
+#check the splitting rules
+rpart.rules(survived, cover = TRUE)
+
+# print Complexity parameter of the current tree
+printcp(survived) # result of rpart
+
+# prune the decision tree based on the best cp
+survived_pruned<- prune(survived, cp= survived$cptable[which.min(survived$cptable[,"xerror"]),"CP"])
+
+#visualize the decision tree
+new_tree <- as.party(survived_pruned)
+plot(new_tree) 
+
+
+#prediction
+prediction_pruned <-predict(survived_pruned, test_data, type = 'class')
+
+#tabulate prediction vs observed labels
+table_mat_pruned <- table(test_data$survived, prediction_pruned) 
+table_mat_pruned
+
+#calculate accuracy
+accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+accuracy(table_mat_pruned)
+
