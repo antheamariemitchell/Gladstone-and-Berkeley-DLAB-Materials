@@ -17,11 +17,13 @@ fviz.p #save ggplot output for methods below
 #train kmeans
 fit <- kmeans(data, centers= 4, nstart=25, algorithm ="Lloyd", iter.max=100)
 fit$cluster
+#nstart has to do with random initialization, so it's set to 25 to start
 
 #visualize clusters
 fviz_cluster(fit, data = data, palette = c("#00AFBB","#2E9FDF", "#E7B800", "#FC4E07"), ggtheme = theme_minimal())
 
-#####Some ways to find the elbow point
+##### Some ways to find the elbow point, aka ways to find the k value, there's no one answer about which to use -- 
+##### there are different methods that can help with that decision, suggestions, not single anwers
 
 #1 kneepointDetection function
 BiocManager::install("SamSPECTRAL")
